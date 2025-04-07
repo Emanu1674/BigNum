@@ -102,19 +102,19 @@ void DS_LstImprimeCientifico(ulst8* list, int digitos) {
     ulst8* p = list;
     int digitosTotal = 0;
 
-    // Conta os dígitos
-    for ( ulst8* t = list; t != NULL; t = t->prox )
+    // Conta os dígitos totais
+    for (ulst8* t = list; t != NULL; t = t->prox)
         digitosTotal++;
 
-    //printf("Scientific Notation: ");
+    printf("%d", p->n);  // Primeiro dígito (antes do ponto)
+    p = p->prox;
 
-    for (int i = 0; i < digitos && p != NULL; ++i, p = p->prox)
-        if( i == 2 ) {
-            printf(".");
-        }
+    if (digitos > 1 && p != NULL)
+        printf(".");
+
+    // Próximos dígitos após o ponto
+    for (int i = 1; i < digitos && p != NULL; ++i, p = p->prox)
         printf("%d", p->n);
-
-    //if (p != NULL) printf("...");
 
     printf("×10^%d\n", digitosTotal - 1);
 }
