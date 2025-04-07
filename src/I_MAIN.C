@@ -98,22 +98,22 @@ void DS_LstImprime( ulst8* list ){
 }
 
 // Imprime a lista [lost] em notação científica, mostrando [dig]e*10^n
-void DS_LstImprimeCientifico(ulst8* list, int digitos) {
+void DS_LstImprimeCientifico( ulst8* list, int digitos ) {
     ulst8* p = list;
     int digitosTotal = 0;
 
     // Conta os dígitos totais
-    for (ulst8* t = list; t != NULL; t = t->prox)
+    for ( ulst8* t = list; t != NULL; t = t->prox )
         digitosTotal++;
 
     printf("%d", p->n);  // Primeiro dígito (antes do ponto)
     p = p->prox;
 
-    if (digitos > 1 && p != NULL)
+    if ( digitos > 1 && p != NULL )
         printf(".");
 
     // Próximos dígitos após o ponto
-    for (int i = 1; i < digitos && p != NULL; ++i, p = p->prox)
+    for ( int i = 1; i < digitos && p != NULL; ++i, p = p->prox )
         printf("%d", p->n);
 
     printf("×10^%d\n", digitosTotal - 1);
@@ -172,5 +172,6 @@ int main() {
     DS_LstImprime(b);
     printf(" = ");
     DS_LstImprimeCientifico(s, 4);
+
     return 0;
 }
