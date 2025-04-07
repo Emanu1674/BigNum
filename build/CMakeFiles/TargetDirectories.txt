@@ -1,0 +1,3 @@
+D:/Visual Studio Code/C/Pessoal/Repo_Pessoal/BigNum/build/CMakeFiles/project.dir
+D:/Visual Studio Code/C/Pessoal/Repo_Pessoal/BigNum/build/CMakeFiles/edit_cache.dir
+D:/Visual Studio Code/C/Pessoal/Repo_Pessoal/BigNum/build/CMakeFiles/rebuild_cache.dir

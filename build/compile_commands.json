@@ -1,0 +1,8 @@
+[
+{
+  "directory": "D:/Visual Studio Code/C/Pessoal/Repo_Pessoal/BigNum/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/project.dir/includes_CXX.rsp -g -o CMakeFiles\\project.dir\\src\\I_MAIN.C.obj -c \"D:\\Visual Studio Code\\C\\Pessoal\\Repo_Pessoal\\BigNum\\src\\I_MAIN.C\"",
+  "file": "D:/Visual Studio Code/C/Pessoal/Repo_Pessoal/BigNum/src/I_MAIN.C",
+  "output": "CMakeFiles/project.dir/src/I_MAIN.C.obj"
+}
+]
