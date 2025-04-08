@@ -24,8 +24,9 @@
 // Apenas se sistema for UNIX
 // --------------------------------------
 
-char getch(void)
-{
+// Retorna um char imediatamente após uma tecla ser pressionada
+char getch(void) {
+
     char buf = 0;
     struct termios old = {0};
     fflush(stdout);
@@ -59,9 +60,9 @@ void E_UnhandledException() {
           "prematuramente. Todos os dados não salvos foram perdidos.\n\n" );
 
     puts("Presione qualquer tecla para continuar.\n");
-    puts( "ERROR 0x4C: FATAL_UNHANDLED\n" );
-    puts( "         UnhandledException" );
+    puts( "ERROR: FATAL_UNHANDLED -> UnhandledException" );
     getch();
+    system( CLEAR );
     exit( EXIT_FAILURE );
 }
 
@@ -121,6 +122,8 @@ ulst8* DS_LstCriar( void ) {
 ulst8* DS_LstInsere(ulst8* list, int i) {
 
     ulst8* lstNovo = (ulst8*) malloc(sizeof(ulst8));
+    if (lstNovo == NULL) E_BugCheck(0x00);
+
     lstNovo->n = i;
     lstNovo->prox = list;
     return lstNovo;
@@ -140,6 +143,8 @@ ulst8* DS_LstUltimo( ulst8* list ) {
 ulst8* DS_LstInsereFinal( ulst8* list, int i ) {
 
     ulst8* lstNovo = (ulst8*) malloc(sizeof(ulst8));
+    if (lstNovo == NULL) E_BugCheck(0x00);
+
     lstNovo->n = i;
     lstNovo->prox = NULL;
     ulst8* ult = DS_LstUltimo(list);
