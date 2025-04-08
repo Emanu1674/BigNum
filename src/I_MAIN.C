@@ -1,6 +1,6 @@
 /* I_MAIN.C
  * ----------------------------------------------------------------------------
- * 
+ * Função main. Apenas inicializa o loop 
  * ----------------------------------------------------------------------------
  */
 
@@ -12,10 +12,97 @@
 
 #ifdef _WIN32
 #define CLEAR "cls"
+#include <conio.h>
 #include <windows.h>
 #else
 #define CLEAR "clear"
+#include <termios.h>
+#include <unistd.h>
+
+// --------------------------------------
+// Implementação de <conio.h>
+// Apenas se sistema for UNIX
+// --------------------------------------
+
+char getch(void)
+{
+    char buf = 0;
+    struct termios old = {0};
+    fflush(stdout);
+    if(tcgetattr(0, &old) < 0)
+        perror("tcsetattr()");
+    old.c_lflag &= ~ICANON;
+    old.c_lflag &= ~ECHO;
+    old.c_cc[VMIN] = 1;
+    old.c_cc[VTIME] = 0;
+    if(tcsetattr(0, TCSANOW, &old) < 0)
+        perror("tcsetattr ICANON");
+    if(read(0, &buf, 1) < 0)
+        perror("read()");
+    old.c_lflag |= ICANON;
+    old.c_lflag |= ECHO;
+    if(tcsetattr(0, TCSADRAIN, &old) < 0)
+        perror("tcsetattr ~ICANON");
+    return buf;
+ }
+
 #endif
+
+// --------------------------------------
+// Tratamento de exceções
+// --------------------------------------
+
+void E_UnhandledException() {
+
+    system( CLEAR );
+    puts( "O programa sofreu um erro irrecuperável e será encerrado\n"
+          "prematuramente. Todos os dados não salvos foram perdidos.\n\n" );
+
+    puts("Presione qualquer tecla para continuar.\n");
+    puts( "ERROR 0x4C: FATAL_UNHANDLED\n" );
+    puts( "         UnhandledException" );
+    getch();
+    exit( EXIT_FAILURE );
+}
+
+void E_MallocOutOfMemory() {
+
+    while (1) {
+        char key = '\0';
+        printf( "\nAlocação de memória falhou\n" );
+        printf( "Abortar, Tentar, Falhar?" );
+
+        fflush(stdin);
+        key = getch();
+        if( key == 'A' || key == 'a' ) {
+            exit(EXIT_FAILURE);
+        } else
+        if( key == 'R' || key == 'r' ) {
+            return;
+        } else
+        if( key == 'F' || key == 'f' ) {
+            return;
+        }
+    }
+}
+
+void E_BugCheck( uint8_t errCode ) {
+
+    switch ( errCode ) {
+        case 0x00:
+            E_MallocOutOfMemory();
+            break;
+        
+        default:
+            E_UnhandledException();
+            break;
+    }
+}
+
+
+// --------------------------------------
+// Código do Programa
+// --------------------------------------
 
 // Struct da lista
 typedef struct S0 {
@@ -26,6 +113,7 @@ typedef struct S0 {
 
 // Cria uma lista vazia
 ulst8* DS_LstCriar( void ) {
+
     return NULL;
 }
 
@@ -100,6 +188,7 @@ void DS_LstImprime( ulst8* list ){
 
 // Imprime a lista [lost] em notação científica, mostrando [dig]*10^n
 void DS_LstImprimeCientifico( ulst8* list, int digitos ) {
+
     ulst8* p = list;
     int digitosTotal = 0;
 
@@ -155,24 +244,23 @@ ulst8* DS_LstSoma( ulst8* a, ulst8* b ) {
 
 int main() {
 
-    srand(time(NULL));
+    //srand(time(NULL));
     setlocale( LC_ALL, "en_us.UTF-8" );
 
     system(CLEAR);
 
-    ulst8* a = DS_LstFromString("31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679");
-    ulst8* b = DS_LstFromString("31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679");
+    ulst8* a = DS_LstFromString("5555");
+    ulst8* b = DS_LstFromString("999");
     ulst8* s = DS_LstSoma(a, b);
 
     a = DS_LstReverter(a);
     b = DS_LstReverter(b);
 
-    printf("Soma: ");
     DS_LstImprime(a);
     printf(" + ");
     DS_LstImprime(b);
     printf(" = ");
-    DS_LstImprimeCientifico(s, 8);
+    DS_LstImprime(s);
 
     return 0;
 }
