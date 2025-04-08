@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <inttypes.h>
 #include <time.h>
 #include <locale.h>
@@ -97,7 +98,7 @@ void DS_LstImprime( ulst8* list ){
         printf("%d", p->n);
 }
 
-// Imprime a lista [lost] em notação científica, mostrando [dig]e*10^n
+// Imprime a lista [lost] em notação científica, mostrando [dig]*10^n
 void DS_LstImprimeCientifico( ulst8* list, int digitos ) {
     ulst8* p = list;
     int digitosTotal = 0;
@@ -159,8 +160,8 @@ int main() {
 
     system(CLEAR);
 
-    ulst8* a = DS_LstFromString("223971923866943488");
-    ulst8* b = DS_LstFromString("269139387994865665");
+    ulst8* a = DS_LstFromString("31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679");
+    ulst8* b = DS_LstFromString("31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679");
     ulst8* s = DS_LstSoma(a, b);
 
     a = DS_LstReverter(a);
@@ -171,7 +172,7 @@ int main() {
     printf(" + ");
     DS_LstImprime(b);
     printf(" = ");
-    DS_LstImprimeCientifico(s, 4);
+    DS_LstImprimeCientifico(s, 8);
 
     return 0;
 }
