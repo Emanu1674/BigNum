@@ -13,7 +13,6 @@
 #ifdef _WIN32
 #define CLEAR "cls"
 #include <conio.h>
-#include <windows.h>
 #else
 #define CLEAR "clear"
 #include <termios.h>
