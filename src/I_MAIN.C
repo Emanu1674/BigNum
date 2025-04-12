@@ -127,6 +127,17 @@ void DS_LstFree( ulst8* list ) {
     }
 }
 
+// Retorna o final da lista [list]
+ulst8* DS_LstUltimo( ulst8* list ) {
+
+    if (!list) return NULL;
+    ulst8* p = list;
+    if (p != NULL)
+        while ( p->prox != NULL )
+            p = p->prox;
+    return p;
+}
+
 // Insere um valor [i] no começo da lista [list]
 ulst8* DS_LstInsere(ulst8* list, int i) {
 
@@ -136,17 +147,6 @@ ulst8* DS_LstInsere(ulst8* list, int i) {
     lstNovo->n = i;
     lstNovo->prox = list;
     return lstNovo;
-}
-
-// Retorna o final da lista [list]
-ulst8* DS_LstUltimo( ulst8* list ) {
-
-    if (!list) return NULL;
-	ulst8* p = list;
-	if (p != NULL)
-		while ( p->prox != NULL )
-			p = p->prox;
-	return p;
 }
 
 // Insere um valor [i] no final da lista [list]
@@ -285,7 +285,7 @@ ulst8* DS_LstSoma( ulst8* a, ulst8* b ) {
 
         uint8_t soma = digitoA + digitoB + carry;
         carry = soma / 10;
-        resultado = DS_LstInsere( resultado, soma % 10 );
+        resultado = DS_LstInsereFinal( resultado, soma % 10 );
 
         if ( a != NULL ) a = a->prox;
         if ( b != NULL ) b = b->prox;
@@ -341,38 +341,125 @@ ulst8* DS_LstSubtrai( ulst8* a, ulst8* b ) {
     return resultado;
 }
 
+// Multiplica uma lista [a] por um único [digito]
+ulst8* DS_LstMultiplicaDigito( ulst8* a, int digito ) {
+    ulst8* resultado = NULL;
+    int carry = 0;
+
+    while (a != NULL || carry > 0) {
+        int prod = carry + (a ? a->n : 0) * digito;
+        
+        // Log the current multiplication step
+        printf("Multiplicando: (%d * %d) + carry = %d -> digito resultado = %d, carry = %d\n", 
+               a ? a->n : 0, digito, prod, prod % 10, prod / 10);
+        
+        carry = prod / 10;
+        
+        // Insere o digito resultado na lista [resultado]
+        resultado = DS_LstInsere(resultado, prod % 10);
+        
+        if (a) a = a->prox;
+    }
+
+    // Soma o carry final como um novo dígito (se houver)
+    if (carry > 0) {
+        resultado = DS_LstInsereFinal(resultado, carry);
+    }
+    printf("Antes de inverter: ");
+    DS_LstImprime(resultado); // Não invertido
+    printf("\n");
+
+    ulst8* resultadoFinal = DS_LstInverter(resultado);
+    printf("Depois de inverter: ");
+    DS_LstImprime(resultadoFinal);
+    printf("\n");
+    return resultadoFinal;
+}
+
+// Desloca a lista para a esquerda [zeros] posições
+ulst8* DS_LstShiftLeft( ulst8* list, int zeros ) {
+
+    while (zeros-- > 0)
+        list = DS_LstInsere(list, 0);
+    return list;
+}
+
+// Multiplica a lista [a] por [b] (Comment for gemini: I can't get this to work no matter what i do ):)
+ulst8* DS_LstMultiplica( ulst8* a, ulst8* b ) {
+
+    ulst8* resultado = NULL;
+    int shift = 0;
+
+    ulst8* bPtr = b;
+
+    while (bPtr != NULL) {
+        printf("Multiplicando A por dígito %d com shift %d...\n", bPtr->n, shift);
+
+        ulst8* parcial = DS_LstMultiplicaDigito(a, bPtr->n);
+        printf("Resultado parcial: ");
+        DS_LstImprimeInvertido(parcial); puts("");
+        ulst8* parcialShifted = DS_LstShiftLeft(parcial, shift);
+        printf("Resultado parcial com shift: ");
+        DS_LstImprimeInvertido(parcialShifted); puts("");
+
+        printf("Lista Resultado (antes da soma): ");
+        DS_LstImprimeInvertido(resultado); puts("");
+
+        ulst8* resultadoTemp = DS_LstSoma(resultado, parcialShifted);
+
+        DS_LstFree(resultado);
+        DS_LstFree(parcial);
+        resultado = resultadoTemp;
+
+        bPtr = bPtr->prox;
+        shift++;
+    }
+
+    return resultado;
+}
+
 int main() {
 
     setlocale( LC_ALL, "en_us.UTF-8" );
     system(CLEAR);
 
-    ulst8* a = DS_LstFromString("4500");
-    ulst8* b = DS_LstFromString("4600");
+    ulst8* a = DS_LstFromString("77807924");
+    ulst8* b = DS_LstFromString("3667965");
     ulst8* add = DS_LstCriar();
            add = DS_LstSoma(a, b);
-    // This is where our subtraction function will go for the testing :)
     ulst8* sub = DS_LstCriar();
            sub = DS_LstSubtrai(a, b);
-
+    ulst8* mul = DS_LstCriar();
+           mul = DS_LstMultiplica(a, b);
+/*
     puts("Listas como elas estão armazenadas:");
     DS_LstImprime(a);
     puts("");
     DS_LstImprime(b);
     puts("\n");
-
-    puts("Teste soma/subtração:");
+*/
+    puts("Teste de soma:");
     DS_LstImprimeInvertido(a);
     printf(" + ");
     DS_LstImprimeInvertido(b);
     printf(" = ");
-    DS_LstImprime(add);
+    DS_LstImprimeInvertido(add);
     puts("");
 
+    puts("Teste de subtração:");
     DS_LstImprimeInvertido(a);
     printf(" - ");
     DS_LstImprimeInvertido(b);
     printf(" = ");
     DS_LstImprimeInvertido(sub);
+    puts("");
+
+    puts("Teste de multiplicação:");
+    DS_LstImprimeInvertido(a);
+    printf(" * ");
+    DS_LstImprimeInvertido(b);
+    printf(" = ");
+    DS_LstImprimeInvertido(mul);
 
     return 0;
 }
