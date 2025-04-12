@@ -1,6 +1,6 @@
 /* I_MAIN.C
  * ----------------------------------------------------------------------------
- * Função main. Apenas inicializa o loop 
+ * Função main.
  * ----------------------------------------------------------------------------
  */
 
@@ -58,7 +58,7 @@ void E_UnhandledException() {
     puts( "O programa sofreu um erro irrecuperável e será encerrado\n"
           "prematuramente. Todos os dados não salvos foram perdidos.\n\n" );
 
-    puts("Presione qualquer tecla para continuar.\n");
+    puts( "Presione qualquer tecla para continuar.\n" );
     puts( "ERROR: FATAL_UNHANDLED -> UnhandledException" );
     getch();
     system( CLEAR );
@@ -96,14 +96,13 @@ void E_BugCheck( uint8_t errCode ) {
         default:
             E_UnhandledException();
             break;
+        }
     }
-}
-
-
-// --------------------------------------
-// Código do Programa
-// --------------------------------------
-
+    
+    // --------------------------------------
+    // Código do Programa
+    // --------------------------------------
+    
 // Struct da lista
 typedef struct S0 {
 
@@ -115,6 +114,17 @@ typedef struct S0 {
 ulst8* DS_LstCriar( void ) {
 
     return NULL;
+}
+
+// Libera a lista quando ela não é mais necessária
+void DS_LstFree( ulst8* list ) {
+
+    ulst8* p = list;
+    while ( p != NULL ) {
+        ulst8* t = p->prox;
+        free(p);
+        p = t;
+    }
 }
 
 // Insere um valor [i] no começo da lista [list]
@@ -131,6 +141,7 @@ ulst8* DS_LstInsere(ulst8* list, int i) {
 // Retorna o final da lista [list]
 ulst8* DS_LstUltimo( ulst8* list ) {
 
+    if (!list) return NULL;
 	ulst8* p = list;
 	if (p != NULL)
 		while ( p->prox != NULL )
@@ -147,16 +158,18 @@ ulst8* DS_LstInsereFinal( ulst8* list, int i ) {
     lstNovo->n = i;
     lstNovo->prox = NULL;
     ulst8* ult = DS_LstUltimo(list);
-    if( ult == NULL )
+    if( ult == NULL ) {
         list = lstNovo;
-    else
+    } else {
         ult->prox = lstNovo;
+    }
     return list;
 }
 
-// Inverte a lista [list]
-ulst8* DS_LstReverter( ulst8* list ) {
+// Inverte a lista [list] in-place (não uma cópia)
+ulst8* DS_LstInverter( ulst8* list ) {
 
+    if (!list) return NULL;
     ulst8* ant = NULL;
     ulst8* atual = list;
     while (atual != NULL) {
@@ -166,6 +179,32 @@ ulst8* DS_LstReverter( ulst8* list ) {
         atual = prox;
     }
     return ant;
+}
+
+// Inverte e retorna uma cópia da lista [list]
+ulst8* DS_LstInverterCopia( ulst8* list ) {
+
+    if (!list) return NULL;
+    ulst8* copia = DS_LstCriar();
+    while (list != NULL) {
+        copia = DS_LstInsere(copia, list->n);
+        list = list->prox;
+    }
+    return copia;
+}
+
+ulst8* DS_LstInverterCopiaSafe( ulst8* list ) {
+    ulst8* nova = DS_LstCriar();
+    ulst8* p = list;
+    while (p) {
+        // Insert at the *start* to reverse
+        ulst8* novo = (ulst8*) malloc(sizeof(ulst8));
+        novo->n = p->n;
+        novo->prox = nova;
+        nova = novo;
+        p = p->prox;
+    }
+    return nova;
 }
 
 // Converte uma string de números em uma lista
@@ -178,16 +217,36 @@ ulst8* DS_LstFromString( const char* str ) {
             list = DS_LstInsere(list, str[i] - '0');
         }
     }
-
     return list;
 }
 
 // Imprime a lista no terminal
-void DS_LstImprime( ulst8* list ){
+void DS_LstImprime( ulst8* list ) {
 
     ulst8* p;
     for ( p = list ; p != NULL ; p = p->prox )
+    printf("%d", p->n);
+}
+
+void DS_LstImprimeSafe( ulst8* list ) {
+    
+    ulst8* p;
+    int safety = 0;
+    for ( p = list ; p != NULL ; p = p->prox ) {
         printf("%d", p->n);
+        if (++safety > 250) {
+            printf("[POSSÍVEL LOOP INFINITO DETECTADO]");
+            break;
+        }
+    }
+}
+
+// Imprime a lista invertida no terminal
+void DS_LstImprimeInvertido( ulst8* list ) {
+
+    ulst8* rev = DS_LstInverterCopia(list);
+    DS_LstImprime(rev);
+    DS_LstFree(rev);
 }
 
 // Imprime a lista [lost] em notação científica, mostrando [dig]*10^n
@@ -208,20 +267,9 @@ void DS_LstImprimeCientifico( ulst8* list, int digitos ) {
 
     // Próximos dígitos após o ponto
     for ( int i = 1; i < digitos && p != NULL; ++i, p = p->prox )
-        printf("%d", p->n);
-
+    printf("%d", p->n);
+    
     printf("×10^%d\n", digitosTotal - 1);
-}
-
-// Libera a lista quando ela não é mais necessária
-void DS_LstFree( ulst8* list ) {
-
-    ulst8* p = list;
-    while ( p != NULL ) {
-        ulst8* t = p->prox;
-        free(p);
-        p = t;
-    }
 }
 
 // Retorna a soma de duas listas [a] e [b]
@@ -246,25 +294,85 @@ ulst8* DS_LstSoma( ulst8* a, ulst8* b ) {
     return resultado;
 }
 
+// Retorna a diferença entre duas listas [a] e [b]
+ulst8* DS_LstSubtrai( ulst8* a, ulst8* b ) {
+
+    ulst8* resultado = DS_LstCriar();
+    int emprestimo = 0;
+
+    // Subtração dígito a dígito
+    while (a != NULL || b != NULL) {
+
+        int dig_a = (a != NULL) ? a->n : 0;
+        int dig_b = (b != NULL) ? b->n : 0;
+
+        int sub = dig_a - dig_b - emprestimo;
+
+        if (sub < 0) {
+            sub += 10;
+            emprestimo = 1;
+        } else {
+            emprestimo = 0;
+        }
+
+        resultado = DS_LstInsereFinal(resultado, sub);
+
+        if (a) a = a->prox;
+        if (b) b = b->prox;
+    }
+
+    // Caso especial: resultado inteiro é zero (ex: 100 - 100)
+    // Aqui verificamos se todos os dígitos são zero
+    ulst8* p = resultado;
+    int todos_zeros = 1;
+    while (p != NULL) {
+        if (p->n != 0) {
+            todos_zeros = 0;
+            break;
+        }
+        p = p->prox;
+    }
+
+    if (todos_zeros) {
+        DS_LstFree(resultado);
+        return DS_LstInsereFinal(NULL, 0);
+    }
+
+    return resultado;
+}
+
 int main() {
 
-    //srand(time(NULL));
     setlocale( LC_ALL, "en_us.UTF-8" );
-
     system(CLEAR);
 
-    ulst8* a = DS_LstFromString("5555");
-    ulst8* b = DS_LstFromString("999");
-    ulst8* s = DS_LstSoma(a, b);
+    ulst8* a = DS_LstFromString("4500");
+    ulst8* b = DS_LstFromString("4600");
+    ulst8* add = DS_LstCriar();
+           add = DS_LstSoma(a, b);
+    // This is where our subtraction function will go for the testing :)
+    ulst8* sub = DS_LstCriar();
+           sub = DS_LstSubtrai(a, b);
 
-    a = DS_LstReverter(a);
-    b = DS_LstReverter(b);
-
+    puts("Listas como elas estão armazenadas:");
     DS_LstImprime(a);
-    printf(" + ");
+    puts("");
     DS_LstImprime(b);
+    puts("\n");
+
+    puts("Teste soma/subtração:");
+    DS_LstImprimeInvertido(a);
+    printf(" + ");
+    DS_LstImprimeInvertido(b);
     printf(" = ");
-    DS_LstImprime(s);
+    DS_LstImprime(add);
+    puts("");
+
+    DS_LstImprimeInvertido(a);
+    printf(" - ");
+    DS_LstImprimeInvertido(b);
+    printf(" = ");
+    DS_LstImprimeInvertido(sub);
 
     return 0;
 }

@@ -2,6 +2,7 @@
     "files.associations": {
         "stdio.h": "c",
         "cstdlib": "c",
-        "I_MAIN.C": "cpp"
+        "I_MAIN.C": "cpp",
+        "E_TEST.C": "cpp"
     }
 }
