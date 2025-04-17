@@ -410,7 +410,7 @@ ulst8* DS_LstShiftLeft( ulst8* list, int zeros ) {
     return list;
 }
 
-// Multiplica a lista [a] por [b] (Comment for gemini: I can't get this to work no matter what i do ):)
+// Multiplica a lista [a] por [b]
 ulst8* DS_LstMultiplica( ulst8* a, ulst8* b ) {
 
     ulst8* resultado = NULL;
@@ -419,17 +419,17 @@ ulst8* DS_LstMultiplica( ulst8* a, ulst8* b ) {
     ulst8* bPtr = b;
 
     while (bPtr != NULL) {
-        printf("Multiplicando A por dígito %d com shift %d...\n", bPtr->n, shift);
+        //printf("Multiplicando A por dígito %d com shift %d...\n", bPtr->n, shift);
 
         ulst8* parcial = DS_LstMultiplicaDigito(a, bPtr->n);
-        printf("Resultado parcial: ");
-        DS_LstImprimeInvertido(parcial); puts("");
+        //printf("Resultado parcial: ");
+        //DS_LstImprimeInvertido(parcial); puts("");
         ulst8* parcialShifted = DS_LstShiftLeft(parcial, shift);
-        printf("Resultado parcial com shift: ");
-        DS_LstImprimeInvertido(parcialShifted); puts("");
+        //printf("Resultado parcial com shift: ");
+        //DS_LstImprimeInvertido(parcialShifted); puts("");
 
-        printf("Lista Resultado (antes da soma): ");
-        DS_LstImprimeInvertido(resultado); puts("");
+        //printf("Lista Resultado (antes da soma): ");
+        //DS_LstImprimeInvertido(resultado); puts("");
 
         ulst8* resultadoTemp = DS_LstSoma(resultado, parcialShifted);
 
@@ -449,8 +449,8 @@ int main() {
     setlocale( LC_ALL, "en_us.UTF-8" );
     system(CLEAR);
 
-    ulst8* a = DS_LstFromString("18321135156798435690569827459827987035984340651");
-    ulst8* b = DS_LstFromString("65167166254561236541156834158523143564741556178");
+    ulst8* a = DS_LstFromString("250");
+    ulst8* b = DS_LstFromString("100");
     ulst8* add = DS_LstCriar();
            add = DS_LstSoma(a, b);
     ulst8* sub = DS_LstCriar();
