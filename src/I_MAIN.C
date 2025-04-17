@@ -139,7 +139,7 @@ ulst8* DS_LstUltimo( ulst8* list ) {
 }
 
 // Insere um valor [i] no começo da lista [list]
-ulst8* DS_LstInsere(ulst8* list, int i) {
+ulst8* DS_LstInsere( ulst8* list, int i ) {
 
     ulst8* lstNovo = (ulst8*) malloc(sizeof(ulst8));
     if (lstNovo == NULL) E_BugCheck(0x00);
@@ -194,6 +194,7 @@ ulst8* DS_LstInverterCopia( ulst8* list ) {
 }
 
 ulst8* DS_LstInverterCopiaSafe( ulst8* list ) {
+    
     ulst8* nova = DS_LstCriar();
     ulst8* p = list;
     while (p) {
@@ -207,7 +208,7 @@ ulst8* DS_LstInverterCopiaSafe( ulst8* list ) {
     return nova;
 }
 
-// Converte uma string de números em uma lista
+// Converte uma string [str] de números em uma lista
 ulst8* DS_LstFromString( const char* str ) {
 
     ulst8* list = DS_LstCriar();
@@ -228,6 +229,7 @@ void DS_LstImprime( ulst8* list ) {
     printf("%d", p->n);
 }
 
+// Imprime a lista [list] em modo de proteção contra loop infinito
 void DS_LstImprimeSafe( ulst8* list ) {
     
     ulst8* p;
@@ -249,7 +251,7 @@ void DS_LstImprimeInvertido( ulst8* list ) {
     DS_LstFree(rev);
 }
 
-// Imprime a lista [lost] em notação científica, mostrando [dig]*10^n
+// Imprime a lista [list] em notação científica, mostrando [dig]*10^n
 void DS_LstImprimeCientifico( ulst8* list, int digitos ) {
 
     ulst8* p = list;
@@ -270,6 +272,30 @@ void DS_LstImprimeCientifico( ulst8* list, int digitos ) {
     printf("%d", p->n);
     
     printf("×10^%d\n", digitosTotal - 1);
+}
+
+// Imprime a inversão da lista [list] em notação científica, mostrando [dig]*10^n
+void DS_LstImprimeCientificoInverso( ulst8* list, int digitos ) {
+
+    ulst8* p = DS_LstInverterCopia(list);
+    int digitosTotal = 0;
+
+    // Conta os dígitos totais
+    for ( ulst8* t = list; t != NULL; t = t->prox )
+        digitosTotal++;
+
+    printf("%d", p->n);  // Primeiro dígito (antes do ponto)
+    p = p->prox;
+
+    if ( digitos > 1 && p != NULL )
+        printf(".");
+
+    // Próximos dígitos após o ponto
+    for ( int i = 1; i < digitos && p != NULL; ++i, p = p->prox )
+    printf("%d", p->n);
+    
+    printf("×10^%d\n", digitosTotal - 1);
+    DS_LstFree(p);
 }
 
 // Retorna a soma de duas listas [a] e [b]
@@ -423,8 +449,8 @@ int main() {
     setlocale( LC_ALL, "en_us.UTF-8" );
     system(CLEAR);
 
-    ulst8* a = DS_LstFromString("77807924");
-    ulst8* b = DS_LstFromString("3667965");
+    ulst8* a = DS_LstFromString("18321135156798435690569827459827987035984340651");
+    ulst8* b = DS_LstFromString("65167166254561236541156834158523143564741556178");
     ulst8* add = DS_LstCriar();
            add = DS_LstSoma(a, b);
     ulst8* sub = DS_LstCriar();
